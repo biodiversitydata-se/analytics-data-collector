@@ -3,7 +3,6 @@ import mysql.connector
 import psycopg2
 from psycopg2.extras import execute_values
 
-# Logger configuration
 logger_config = {
     'host': os.getenv('LOGGER_HOST'),
     'port': os.getenv('LOGGER_PORT'),
@@ -12,7 +11,6 @@ logger_config = {
     'password': os.getenv('LOGGER_PASSWORD'),
 }
 
-# Analytics DB configuration
 analytics_config = {
     'host': os.getenv('ANALYTICS_HOST'),
     'port': os.getenv('ANALYTICS_PORT'),
@@ -21,32 +19,36 @@ analytics_config = {
     'password': os.getenv('ANALYTICS_PASSWORD'),
 }
 
-# Query to fetch data from Logger
-logger_query = """
+
+def fetch_downloads_from_logger():
+    downloads_query = """
 SELECT
   le.id,
   created,
   lrt.name AS reason,
   lst.name AS source,
-  CASE 
-    WHEN lst.name = 'ALA' OR user_agent LIKE 'mozilla%' THEN 'Web'
+  CASE
+    WHEN lst.name = 'ALA'
+    OR user_agent LIKE 'mozilla%' THEN 'Web'
     WHEN lst.name = 'ALA4R' THEN 'SBDI4R-1'
     WHEN lst.name = 'galah' THEN 'galah-R'
     WHEN user_agent LIKE 'galah-python%' THEN 'galah-python'
     ELSE NULL
   END AS client,
-  CASE WHEN lrt.name = 'testing' OR user_email IN (
-    'manash.shah@nrm.se',
-    'manash.shah@gmail.com',
-    'mats.bovin@nrm.se',
-    'mats.bovin@gmail.com',
-    'sbdi4r-test@biodiversitydata.se',
-    'aleruete@gmail.com',
-    'martinjwestgate@gmail.com') 
-    THEN 1 
-    ELSE 0 
+  CASE
+    WHEN lrt.name = 'testing'
+    OR user_email IN (
+      'manash.shah@nrm.se',
+      'manash.shah@gmail.com',
+      'mats.bovin@nrm.se',
+      'mats.bovin@gmail.com',
+      'sbdi4r-test@biodiversitydata.se',
+      'aleruete@gmail.com',
+      'martinjwestgate@gmail.com'
+    ) THEN 1
+    ELSE 0
   END AS is_test,
-  sha2(concat('salt', user_email), 256) AS user_key,
+  SHA2 (CONCAT('""" + os.getenv('SALT') + """', user_email), 256) AS user_key,
   user_agent
 FROM
   log_event le
@@ -56,18 +58,16 @@ WHERE
   log_event_type_id = 1002;
 """
 
-# Function to fetch data from Logger
-def fetch_data_from_logger():
     connection = mysql.connector.connect(**logger_config)
     cursor = connection.cursor(dictionary=True)
-    cursor.execute(logger_query)
+    cursor.execute(downloads_query)
     results = cursor.fetchall()
     cursor.close()
     connection.close()
     return results
 
-# Function to insert data into PostgreSQL
-def insert_data_into_analytics_db(data):
+
+def insert_downloads_into_analytics_db(downloads):
     connection = psycopg2.connect(**analytics_config)
 
     cursor = connection.cursor()
@@ -91,7 +91,7 @@ def insert_data_into_analytics_db(data):
             row['user_key'],
             row['user_agent']
         )
-        for row in data
+        for row in downloads
     ]
     execute_values(cursor, insert_query, values)
     connection.commit()
@@ -99,10 +99,10 @@ def insert_data_into_analytics_db(data):
     connection.close()
 
 if __name__ == "__main__":
-    print("Fetching data from Logger...")
-    mysql_data = fetch_data_from_logger()
-    print(f"Fetched {len(mysql_data)} rows.")
+    print("Fetching downloads from Logger...")
+    downloads = fetch_downloads_from_logger()
+    print(f"Fetched {len(downloads)} rows")
 
-    print("Inserting data into Analytics-DB...")
-    insert_data_into_analytics_db(mysql_data)
-    print("Data insertion completed.")
+    print("Inserting downloads into Analytics-DB...")
+    insert_downloads_into_analytics_db(downloads)
+    print("Done")
