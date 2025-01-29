@@ -1,15 +1,7 @@
 import os
 import mysql.connector
 import psycopg2
-from psycopg2.extras import execute_values
-
-logger_config = {
-    'host': os.getenv('LOGGER_HOST'),
-    'port': os.getenv('LOGGER_PORT'),
-    'database': os.getenv('LOGGER_DATABASE'),
-    'user': os.getenv('LOGGER_USER'),
-    'password': os.getenv('LOGGER_PASSWORD'),
-}
+import psycopg2.extras
 
 analytics_config = {
     'host': os.getenv('ANALYTICS_HOST'),
@@ -17,6 +9,14 @@ analytics_config = {
     'dbname': os.getenv('ANALYTICS_DATABASE'),
     'user': os.getenv('ANALYTICS_USER'),
     'password': os.getenv('ANALYTICS_PASSWORD'),
+}
+
+logger_config = {
+    'host': os.getenv('LOGGER_HOST'),
+    'port': os.getenv('LOGGER_PORT'),
+    'database': os.getenv('LOGGER_DATABASE'),
+    'user': os.getenv('LOGGER_USER'),
+    'password': os.getenv('LOGGER_PASSWORD'),
 }
 
 
@@ -68,18 +68,16 @@ WHERE
 
 
 def insert_downloads_into_analytics_db(downloads):
-    connection = psycopg2.connect(**analytics_config)
 
+    connection = psycopg2.connect(**analytics_config)
     cursor = connection.cursor()
+
     cursor.execute("TRUNCATE TABLE downloads;")
-    connection.commit()
-    cursor.close()
 
     insert_query = """
     INSERT INTO downloads (id, created, reason, source, client, is_test, user_key, user_agent)
     VALUES %s
     """
-    cursor = connection.cursor()
     values = [
         (
             row['id'],
@@ -93,7 +91,8 @@ def insert_downloads_into_analytics_db(downloads):
         )
         for row in downloads
     ]
-    execute_values(cursor, insert_query, values)
+    psycopg2.extras.execute_values(cursor, insert_query, values)
+
     connection.commit()
     cursor.close()
     connection.close()
