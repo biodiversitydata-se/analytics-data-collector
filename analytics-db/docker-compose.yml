@@ -1,0 +1,18 @@
+services:
+
+  analytics_db:
+    image: postgres:17.2
+    container_name: analytics-db
+    environment:
+      POSTGRES_USER: analytics
+      POSTGRES_DB: analytics
+      POSTGRES_PASSWORD: analytics
+      TZ: Europe/Stockholm
+    volumes:
+      - analytics_pg_data:/var/lib/postgresql/data
+      - ./initdb.d:/docker-entrypoint-initdb.d
+    ports:
+      - "5432:5432"
+
+volumes:
+  analytics_pg_data:
