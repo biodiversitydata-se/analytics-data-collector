@@ -8,9 +8,9 @@ CREATE TABLE download (
     user_key VARCHAR(255),
     user_agent VARCHAR(255)
 );
-CREATE INDEX created_idx ON download (created);
+CREATE INDEX download_created_idx ON download (created);
 
-CREATE TABLE sbdi_user (
+CREATE TABLE "user" (
     id INTEGER NOT NULL PRIMARY KEY,
     user_key VARCHAR(255) NOT NULL,
     date_created TIMESTAMP NOT NULL,
@@ -19,5 +19,5 @@ CREATE TABLE sbdi_user (
     country VARCHAR(255),
     organisation VARCHAR(255)
 );
-CREATE INDEX date_created_idx ON sbdi_user (date_created);
-CREATE INDEX last_login_idx ON sbdi_user (last_login);
+CREATE INDEX user_date_created_idx ON "user" (date_created);
+CREATE INDEX user_last_login_idx ON "user" (last_login);

@@ -42,10 +42,10 @@ def _insert(users, connection):
 
     cursor = connection.cursor()
 
-    cursor.execute("TRUNCATE TABLE sbdi_user;")
+    cursor.execute("TRUNCATE TABLE \"user\";")
 
     insert_query = """
-    INSERT INTO sbdi_user (id, user_key, date_created, last_updated, last_login, country, organisation)
+    INSERT INTO "user" (id, user_key, date_created, last_updated, last_login, country, organisation)
     VALUES %s
     """
     values = [
