@@ -1,7 +1,6 @@
 import os
 
 import mysql.connector
-import psycopg2
 import psycopg2.extras
 
 logger_config = {
@@ -60,9 +59,8 @@ WHERE
     return results
 
 
-def insert_downloads_into_analytics_db(downloads, analytics_config):
+def insert_downloads_into_analytics_db(downloads, connection):
 
-    connection = psycopg2.connect(**analytics_config)
     cursor = connection.cursor()
 
     cursor.execute("TRUNCATE TABLE download;")
@@ -88,4 +86,3 @@ def insert_downloads_into_analytics_db(downloads, analytics_config):
 
     connection.commit()
     cursor.close()
-    connection.close()

@@ -1,5 +1,7 @@
 import os
 
+import psycopg2
+
 import users
 import downloads
 
@@ -13,12 +15,15 @@ analytics_config = {
 
 
 if __name__ == "__main__":
+
+    analytics_conn = psycopg2.connect(**analytics_config)
+
     print("Fetching downloads from Logger...")
     result = downloads.fetch_downloads_from_logger()
     print(f"Fetched {len(result)} rows")
 
     print("Inserting downloads into Analytics-DB...")
-    downloads.insert_downloads_into_analytics_db(result, analytics_config)
+    downloads.insert_downloads_into_analytics_db(result, analytics_conn)
     print("Done")
 
     print("Fetching users")
@@ -26,5 +31,7 @@ if __name__ == "__main__":
     print(f"Fetched {len(result)} rows")
 
     print("Inserting users...")
-    users.insert_users(result, analytics_config)
+    users.insert_users(result, analytics_conn)
     print("Done")
+
+    analytics_conn.close()

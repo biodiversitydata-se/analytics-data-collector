@@ -1,7 +1,6 @@
 import os
 
 import mysql.connector
-import psycopg2
 import psycopg2.extras
 
 user_config = {
@@ -38,9 +37,8 @@ FROM
     return results
 
 
-def insert_users(users, analytics_config):
+def insert_users(users, connection):
 
-    connection = psycopg2.connect(**analytics_config)
     cursor = connection.cursor()
 
     cursor.execute("TRUNCATE TABLE sbdi_user;")
@@ -65,5 +63,4 @@ def insert_users(users, analytics_config):
 
     connection.commit()
     cursor.close()
-    connection.close()
    
