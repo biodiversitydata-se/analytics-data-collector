@@ -56,7 +56,7 @@ SELECT
     ) THEN 1
     ELSE 0
   END AS is_test,
-  SHA2 (CONCAT('""" + os.getenv('SALT') + """', user_email), 256) AS user_key,
+  sha2(concat('""" + os.getenv('SALT') + """', user_email), 256) AS user_key,
   user_agent
 FROM
   log_event le
@@ -108,11 +108,18 @@ def insert_downloads_into_analytics_db(downloads):
 
 def fetch_users():
     query = """
-select u.userid as id, sha2(username, 256) as user_key, date_created, last_updated, last_login, pc.value as country, po.value as organisation
-from users u
-left join profiles pc on u.userid = pc.userid and pc.property = 'country'
-left join profiles po on u.userid = po.userid and po.property = 'organisation'
-where last_login is not null;
+SELECT
+  u.userid AS id,
+  sha2(concat('""" + os.getenv('SALT') + """', username), 256) AS user_key,
+  date_created,
+  last_updated,
+  last_login,
+  pc.value AS country,
+  po.value AS organisation
+FROM
+  users u
+  LEFT JOIN profiles pc ON u.userid = pc.userid AND pc.property = 'country'
+  LEFT JOIN profiles po ON u.userid = po.userid AND po.property = 'organisation';
 """
 
     connection = mysql.connector.connect(**user_config)
