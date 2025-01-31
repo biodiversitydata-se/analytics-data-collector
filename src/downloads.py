@@ -3,7 +3,7 @@ import os
 import mysql.connector
 import psycopg2.extras
 
-logger_config = {
+db_config = {
     'host': os.getenv('LOGGER_HOST'),
     'port': os.getenv('LOGGER_PORT'),
     'database': os.getenv('LOGGER_DATABASE'),
@@ -12,8 +12,8 @@ logger_config = {
 }
 
 
-def fetch_downloads_from_logger():
-    downloads_query = """
+def _fetch():
+    query = """
 SELECT
   le.id,
   created,
@@ -50,16 +50,17 @@ WHERE
   log_event_type_id = 1002;
 """
 
-    connection = mysql.connector.connect(**logger_config)
+    connection = mysql.connector.connect(**db_config)
     cursor = connection.cursor(dictionary=True)
-    cursor.execute(downloads_query)
+    cursor.execute(query)
     results = cursor.fetchall()
     cursor.close()
     connection.close()
+
     return results
 
 
-def insert_downloads_into_analytics_db(downloads, connection):
+def _insert(downloads, connection):
 
     cursor = connection.cursor()
 
@@ -86,3 +87,12 @@ def insert_downloads_into_analytics_db(downloads, connection):
 
     connection.commit()
     cursor.close()
+
+def transfer(analytics_conn):
+    print("Downloads > fetching", end="")
+    result = _fetch()
+    print(f" - done, {len(result)} rows", end="")
+
+    print(" > inserting", end="")
+    _insert(result, analytics_conn)
+    print(" - done")

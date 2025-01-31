@@ -3,7 +3,7 @@ import os
 import mysql.connector
 import psycopg2.extras
 
-user_config = {
+db_config = {
     'host': os.getenv('CAS_HOST'),
     'port': os.getenv('CAS_PORT'),
     'database': os.getenv('CAS_DATABASE'),
@@ -12,32 +12,33 @@ user_config = {
 }
 
 
-def fetch_users():
+def _fetch():
     query = """
 SELECT
-  u.userid AS id,
-  sha2(concat('""" + os.getenv('SALT') + """', username), 256) AS user_key,
-  date_created,
-  last_updated,
-  last_login,
-  pc.value AS country,
-  po.value AS organisation
+    u.userid AS id,
+    sha2(concat('""" + os.getenv('SALT') + """', username), 256) AS user_key,
+    date_created,
+    last_updated,
+    last_login,
+    pc.value AS country,
+    po.value AS organisation
 FROM
-  users u
-  LEFT JOIN profiles pc ON u.userid = pc.userid AND pc.property = 'country'
-  LEFT JOIN profiles po ON u.userid = po.userid AND po.property = 'organisation';
+    users u
+    LEFT JOIN profiles pc ON u.userid = pc.userid AND pc.property = 'country'
+    LEFT JOIN profiles po ON u.userid = po.userid AND po.property = 'organisation';
 """
 
-    connection = mysql.connector.connect(**user_config)
+    connection = mysql.connector.connect(**db_config)
     cursor = connection.cursor(dictionary=True)
     cursor.execute(query)
     results = cursor.fetchall()
     cursor.close()
     connection.close()
+
     return results
 
 
-def insert_users(users, connection):
+def _insert(users, connection):
 
     cursor = connection.cursor()
 
@@ -63,4 +64,13 @@ def insert_users(users, connection):
 
     connection.commit()
     cursor.close()
-   
+
+
+def transfer(analytics_conn):
+    print("Users > fetching", end="")
+    result = _fetch()
+    print(f" - done, {len(result)} rows", end="")
+
+    print(" > inserting", end="")
+    _insert(result, analytics_conn)
+    print(" - done")
