@@ -1,4 +1,4 @@
-CREATE TABLE downloads (
+CREATE TABLE download (
     id INTEGER NOT NULL PRIMARY KEY,
     created TIMESTAMP NOT NULL,
     reason VARCHAR(255),
@@ -8,7 +8,7 @@ CREATE TABLE downloads (
     user_key VARCHAR(255),
     user_agent VARCHAR(255)
 );
-CREATE INDEX created_idx ON downloads (created);
+CREATE INDEX created_idx ON download (created);
 
 CREATE TABLE sbdi_user (
     id INTEGER NOT NULL PRIMARY KEY,

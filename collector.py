@@ -80,10 +80,10 @@ def insert_downloads_into_analytics_db(downloads):
     connection = psycopg2.connect(**analytics_config)
     cursor = connection.cursor()
 
-    cursor.execute("TRUNCATE TABLE downloads;")
+    cursor.execute("TRUNCATE TABLE download;")
 
     insert_query = """
-    INSERT INTO downloads (id, created, reason, source, client, is_test, user_key, user_agent)
+    INSERT INTO download (id, created, reason, source, client, is_test, user_key, user_agent)
     VALUES %s
     """
     values = [
