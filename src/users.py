@@ -67,10 +67,15 @@ def _insert(users, connection):
 
 
 def transfer(analytics_conn):
-    print("Users > fetching", end="")
-    result = _fetch()
-    print(f" - done, {len(result)} rows", end="")
 
-    print(" > inserting", end="")
-    _insert(result, analytics_conn)
-    print(" - done")
+    try:
+        print("Users > fetching", end="")
+        result = _fetch()
+        print(f" - done, {len(result)} rows", end="")
+
+        print(" > inserting", end="")
+        _insert(result, analytics_conn)
+        print(" - done")
+    
+    except Exception as e:
+        print(f"\nUsers failed: {e}")

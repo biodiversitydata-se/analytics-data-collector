@@ -88,11 +88,17 @@ def _insert(downloads, connection):
     connection.commit()
     cursor.close()
 
-def transfer(analytics_conn):
-    print("Downloads > fetching", end="")
-    result = _fetch()
-    print(f" - done, {len(result)} rows", end="")
 
-    print(" > inserting", end="")
-    _insert(result, analytics_conn)
-    print(" - done")
+def transfer(analytics_conn):
+    
+    try:
+      print("Downloads > fetching", end="")
+      result = _fetch()
+      print(f" - done, {len(result)} rows", end="")
+
+      print(" > inserting", end="")
+      _insert(result, analytics_conn)
+      print(" - done")
+    
+    except Exception as e:
+        print(f"\nDownloads failed: {e}")

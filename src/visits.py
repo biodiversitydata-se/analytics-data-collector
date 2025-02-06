@@ -103,10 +103,15 @@ def _insert(sites, visits, actions, connection):
 
 
 def transfer(analytics_conn):
-    print("Visits > fetching", end="")
-    sites, visits, actions = _fetch()
-    print(f" - done, {len(sites)} sites", end="")
 
-    print(" > inserting", end="")
-    _insert(sites, visits, actions, analytics_conn)
-    print(" - done")
+    try:
+        print("Visits > fetching", end="")
+        sites, visits, actions = _fetch()
+        print(f" - done, {len(sites)} sites", end="")
+
+        print(" > inserting", end="")
+        _insert(sites, visits, actions, analytics_conn)
+        print(" - done")
+    
+    except Exception as e:
+        print(f"\nVisits failed: {e}")
