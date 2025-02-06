@@ -25,7 +25,7 @@ SELECT
 FROM
     users u
     LEFT JOIN profiles pc ON u.userid = pc.userid AND pc.property = 'country'
-    LEFT JOIN profiles po ON u.userid = po.userid AND po.property = 'organisation';
+    LEFT JOIN profiles po ON u.userid = po.userid AND po.property = 'organisation'
 """
 
     connection = mysql.connector.connect(**db_config)
@@ -42,7 +42,7 @@ def _insert(users, connection):
 
     cursor = connection.cursor()
 
-    cursor.execute("TRUNCATE TABLE \"user\";")
+    cursor.execute("TRUNCATE TABLE \"user\"")
 
     insert_query = """
     INSERT INTO "user" (id, user_key, date_created, last_updated, last_login, country, organisation)

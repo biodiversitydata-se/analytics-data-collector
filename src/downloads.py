@@ -47,7 +47,7 @@ FROM
   LEFT JOIN log_source_type lst ON le.log_source_type_id = lst.id
   LEFT JOIN log_reason_type lrt ON le.log_reason_type_id = lrt.id
 WHERE
-  log_event_type_id = 1002;
+  log_event_type_id = 1002
 """
 
     connection = mysql.connector.connect(**db_config)
@@ -64,7 +64,7 @@ def _insert(downloads, connection):
 
     cursor = connection.cursor()
 
-    cursor.execute("TRUNCATE TABLE download;")
+    cursor.execute("TRUNCATE TABLE download")
 
     insert_query = """
     INSERT INTO download (id, created, reason, source, client, is_test, user_key, user_agent)
