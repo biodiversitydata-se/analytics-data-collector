@@ -4,6 +4,7 @@ import psycopg2
 
 import downloads
 import users
+import visits
 
 analytics_config = {
     'host': os.getenv('ANALYTICS_HOST'),
@@ -20,5 +21,6 @@ if __name__ == "__main__":
 
     downloads.transfer(analytics_conn)
     users.transfer(analytics_conn)
+    visits.transfer(analytics_conn)
 
     analytics_conn.close()

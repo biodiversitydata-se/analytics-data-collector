@@ -17,3 +17,6 @@ CAS_PORT=3306
 CAS_DATABASE=emmet
 CAS_USER=cas
 CAS_PASSWORD=cas
+
+MATOMO_HOST=https://matomo.biodiversitydata.se
+MATOMO_TOKEN=replace_with_your_token
