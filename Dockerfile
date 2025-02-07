@@ -1,4 +1,5 @@
 FROM python:3.13-slim
+ENV TZ=Europe/Stockholm
 
 WORKDIR /app
 COPY src/*.py /app
