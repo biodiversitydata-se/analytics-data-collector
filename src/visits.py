@@ -17,7 +17,10 @@ def _make_api_request(method, additional_query_params = {}):
         'token_auth': os.getenv('MATOMO_TOKEN'),
     }
 
-    response = requests.post(f"{os.getenv('MATOMO_HOST')}/index.php", params=query_params, data=payload)
+    response = requests.post(f"{os.getenv('MATOMO_HOST')}/index.php", 
+                             params=query_params, 
+                             data=payload,
+                             timeout=(10, 30))
     response.raise_for_status()
 
     return response.json()
