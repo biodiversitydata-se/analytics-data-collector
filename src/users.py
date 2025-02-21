@@ -79,3 +79,4 @@ def transfer(analytics_conn):
     
     except Exception as e:
         print(f"\nUsers failed: {e}")
+        analytics_conn.rollback()

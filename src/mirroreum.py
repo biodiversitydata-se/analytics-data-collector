@@ -74,3 +74,4 @@ def transfer(analytics_conn):
     
     except Exception as e:
         print(f"\nMirroreum failed: {e}")
+        analytics_conn.rollback()

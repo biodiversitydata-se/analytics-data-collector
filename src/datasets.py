@@ -166,3 +166,4 @@ def transfer(analytics_conn):
     
     except Exception as e:
         print(f"\nDatasets failed: {e}")
+        analytics_conn.rollback()

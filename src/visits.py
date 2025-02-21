@@ -118,3 +118,4 @@ def transfer(analytics_conn):
     
     except Exception as e:
         print(f"\nVisits failed: {e}")
+        analytics_conn.rollback()
