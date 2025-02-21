@@ -1,0 +1,83 @@
+import os
+
+import mysql.connector
+import psycopg2.extras
+
+db_config = {
+    'host': os.getenv('COLLECTORY_HOST'),
+    'port': os.getenv('COLLECTORY_PORT'),
+    'database': os.getenv('COLLECTORY_DATABASE'),
+    'user': os.getenv('COLLECTORY_USER'),
+    'password': os.getenv('COLLECTORY_PASSWORD'),
+}
+
+
+def _fetch():
+    query = """
+SELECT
+  dr.id,
+  dr.uid,
+  dr.name,
+  dr.resource_type,
+  dp.name AS data_provider,
+  i.name AS institution,
+  dr.date_created,
+  dr.data_currency
+FROM
+  data_resource dr
+  LEFT JOIN data_provider dp ON dp.id = dr.data_provider_id
+  LEFT JOIN institution i ON i.id = dr.institution_id;
+"""
+
+    connection = mysql.connector.connect(**db_config)
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute(query)
+    results = cursor.fetchall()
+    cursor.close()
+    connection.close()
+
+    return results
+
+
+def _insert(datasets, connection):
+
+    cursor = connection.cursor()
+
+    cursor.execute("TRUNCATE TABLE dataset")
+
+    insert_query = """
+    INSERT INTO dataset (id, uid, name, resource_type, data_provider, institution, date_created, data_currency)
+    VALUES %s
+    """
+    values = [
+        (
+            row['id'],
+            row['uid'],
+            row['name'],
+            row['resource_type'],
+            row['data_provider'],
+            row['institution'],
+            row['date_created'],
+            row['data_currency']
+        )
+        for row in datasets
+    ]
+    psycopg2.extras.execute_values(cursor, insert_query, values)
+
+    connection.commit()
+    cursor.close()
+
+
+def transfer(analytics_conn):
+
+    try:
+        print("Datasets > fetching", end="")
+        result = _fetch()
+        print(f" - done, {len(result)} rows", end="")
+
+        print(" > inserting", end="")
+        _insert(result, analytics_conn)
+        print(" - done")
+    
+    except Exception as e:
+        print(f"\nDatasets failed: {e}")
