@@ -1,3 +1,4 @@
+import datetime
 import os
 import re
 
@@ -97,6 +98,7 @@ def _insert(datasets, counts, connection):
 
     cursor = connection.cursor()
 
+    # Datasets
     cursor.execute("TRUNCATE TABLE dataset")
 
     insert_query = """
@@ -127,6 +129,22 @@ def _insert(datasets, counts, connection):
             counts.get(row['uid'], {}).get('media_count', 0),
         )
         for row in datasets
+    ]
+    psycopg2.extras.execute_values(cursor, insert_query, values)
+
+    # Dataset snapshot
+    insert_query = """
+    INSERT INTO dataset_snapshot (uid, snapshot_date, records, media_files)
+    VALUES %s
+    """
+    values = [
+        (
+            uid,
+            datetime.datetime.today(),
+            item['record_count'],
+            item['media_count'],
+        )
+        for (uid, item) in counts.items()
     ]
     psycopg2.extras.execute_values(cursor, insert_query, values)
 
