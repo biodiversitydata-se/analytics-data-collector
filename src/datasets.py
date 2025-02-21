@@ -1,4 +1,5 @@
 import os
+import re
 
 import mysql.connector
 import psycopg2.extras
@@ -25,8 +26,13 @@ def _fetch_record_counts():
                             timeout=(10, 30))
     response.raise_for_status()
 
-    json_response = response.json()
-    print(json_response)
+    result = {}
+    uid_pattern = re.compile(r'data_resource_uid:"(dr\d+)"')
+    for item in response.json()[0]['fieldResult']:
+        uid = uid_pattern.findall(item['fq'])[0]
+        result[uid] = item['count']
+
+    return result
 
 
 def _fetch_media_counts():
@@ -39,8 +45,7 @@ def _fetch_media_counts():
                             timeout=(10, 30))
     response.raise_for_status()
 
-    json_response = response.json()
-    print(json_response)
+    return response.json()['dataResourceUid']
 
 
 def _fetch_from_db():
@@ -72,8 +77,11 @@ FROM
 
 def _fetch():
 
-    _fetch_record_counts()
-    _fetch_media_counts()
+    record_counts =_fetch_record_counts()
+    print(record_counts)
+    print()
+    media_counts = _fetch_media_counts()
+    print(media_counts)
     result = _fetch_from_db()
     return result
 
