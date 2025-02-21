@@ -70,7 +70,7 @@ CREATE TABLE dataset (
     date_created DATE,
     data_currency DATE,
     records INTEGER,
-    media_files INTEGER
+    media INTEGER
 );
 
 CREATE TABLE dataset_snapshot (
@@ -78,6 +78,6 @@ CREATE TABLE dataset_snapshot (
     uid VARCHAR(20) NOT NULL,
     snapshot_date DATE NOT NULL,
     records INTEGER,
-    media_files INTEGER
+    media INTEGER
 );
 CREATE UNIQUE INDEX dataset_snapshot_uid_snapshot_date_idx ON dataset_snapshot (uid, snapshot_date);

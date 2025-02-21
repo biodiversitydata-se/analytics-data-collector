@@ -112,7 +112,7 @@ def _insert(datasets, counts, save_snapshot, connection):
         date_created,
         data_currency,
         records,
-        media_files)
+        media)
     VALUES %s
     """
     values = [
@@ -134,7 +134,7 @@ def _insert(datasets, counts, save_snapshot, connection):
 
     # Dataset snapshot
     if save_snapshot:
-        insert_query = "INSERT INTO dataset_snapshot (uid, snapshot_date, records, media_files) VALUES %s"
+        insert_query = "INSERT INTO dataset_snapshot (uid, snapshot_date, records, media) VALUES %s"
         values = [
             (
                 uid,
