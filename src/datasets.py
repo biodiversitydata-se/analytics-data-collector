@@ -18,7 +18,7 @@ def _fetch_record_counts():
 
     query_params = {
         'facets': 'data_resource_uid',
-        'flmit': '-1',
+        'flimit': '-1',
         'count': '0',
     }
     response = requests.get(f"{os.getenv('BIOCACHE_HOST')}/ws/occurrences/facets", 
@@ -48,7 +48,7 @@ def _fetch_media_counts():
     return response.json()['dataResourceUid']
 
 
-def _fetch_from_db():
+def _fetch_datasets():
     query = """
 SELECT
   dr.id,
@@ -77,23 +77,40 @@ FROM
 
 def _fetch():
 
-    record_counts =_fetch_record_counts()
-    print(record_counts)
-    print()
+    record_counts = _fetch_record_counts()
     media_counts = _fetch_media_counts()
-    print(media_counts)
-    result = _fetch_from_db()
-    return result
+
+    counts = {
+        uid: {
+              'record_count': record_count, 
+              'media_count': media_counts.get(uid, 0)
+             } 
+        for (uid, record_count) in record_counts.items() 
+    }
+    
+    datasets = _fetch_datasets()
+
+    return datasets, counts
 
 
-def _insert(datasets, connection):
+def _insert(datasets, counts, connection):
 
     cursor = connection.cursor()
 
     cursor.execute("TRUNCATE TABLE dataset")
 
     insert_query = """
-    INSERT INTO dataset (id, uid, name, resource_type, data_provider, institution, date_created, data_currency)
+    INSERT INTO dataset (
+        id,
+        uid,
+        name,
+        resource_type,
+        data_provider,
+        institution,
+        date_created,
+        data_currency,
+        records,
+        media_files)
     VALUES %s
     """
     values = [
@@ -105,7 +122,9 @@ def _insert(datasets, connection):
             row['data_provider'],
             row['institution'],
             row['date_created'],
-            row['data_currency']
+            row['data_currency'],
+            counts.get(row['uid'], {}).get('record_count', 0),
+            counts.get(row['uid'], {}).get('media_count', 0),
         )
         for row in datasets
     ]
@@ -119,11 +138,11 @@ def transfer(analytics_conn):
 
     try:
         print("Datasets > fetching", end="")
-        result = _fetch()
-        print(f" - done, {len(result)} rows", end="")
+        datasets, counts = _fetch()
+        print(f" - done, {len(datasets)} rows", end="")
 
         print(" > inserting", end="")
-        _insert(result, analytics_conn)
+        _insert(datasets, counts, analytics_conn)
         print(" - done")
     
     except Exception as e:
