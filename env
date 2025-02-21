@@ -28,3 +28,6 @@ MATOMO_HOST=https://matomo.biodiversitydata.se
 MATOMO_TOKEN=replace_with_your_token
 
 LOKI_HOST=http://host.docker.internal:3100
+
+BIOCACHE_HOST=https://records.biodiversitydata.se
+IMAGE_SERVICE_HOST=https://images.biodiversitydata.se

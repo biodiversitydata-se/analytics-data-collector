@@ -2,6 +2,7 @@ import os
 
 import mysql.connector
 import psycopg2.extras
+import requests
 
 db_config = {
     'host': os.getenv('COLLECTORY_HOST'),
@@ -12,7 +13,37 @@ db_config = {
 }
 
 
-def _fetch():
+def _fetch_record_counts():
+
+    query_params = {
+        'facets': 'data_resource_uid',
+        'flmit': '-1',
+        'count': '0',
+    }
+    response = requests.get(f"{os.getenv('BIOCACHE_HOST')}/ws/occurrences/facets", 
+                            params=query_params, 
+                            timeout=(10, 30))
+    response.raise_for_status()
+
+    json_response = response.json()
+    print(json_response)
+
+
+def _fetch_media_counts():
+
+    query_params = {
+        'facet': 'dataResourceUid',
+    }
+    response = requests.get(f"{os.getenv('IMAGE_SERVICE_HOST')}/ws/facet", 
+                            params=query_params, 
+                            timeout=(10, 30))
+    response.raise_for_status()
+
+    json_response = response.json()
+    print(json_response)
+
+
+def _fetch_from_db():
     query = """
 SELECT
   dr.id,
@@ -37,6 +68,14 @@ FROM
     connection.close()
 
     return results
+
+
+def _fetch():
+
+    _fetch_record_counts()
+    _fetch_media_counts()
+    result = _fetch_from_db()
+    return result
 
 
 def _insert(datasets, connection):
