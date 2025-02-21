@@ -58,3 +58,26 @@ CREATE TABLE mirroreum_login (
     is_test BOOLEAN
 );
 CREATE UNIQUE INDEX mirroreum_login_ip_login_at_idx ON mirroreum_login (ip, login_at);
+
+/* Dataset */
+CREATE TABLE dataset (
+    id INTEGER NOT NULL PRIMARY KEY,
+    uid VARCHAR(20) NOT NULL,
+    name VARCHAR(1024) NOT NULL,
+    resource_type VARCHAR(255) NOT NULL,
+    data_provider VARCHAR(1024),
+    institution VARCHAR(1024),
+    date_created DATE,
+    data_currency DATE,
+    records INTEGER,
+    media INTEGER
+);
+
+CREATE TABLE dataset_snapshot (
+    id SERIAL PRIMARY KEY,
+    uid VARCHAR(20) NOT NULL,
+    snapshot_date DATE NOT NULL,
+    records INTEGER,
+    media INTEGER
+);
+CREATE UNIQUE INDEX dataset_snapshot_uid_snapshot_date_idx ON dataset_snapshot (uid, snapshot_date);

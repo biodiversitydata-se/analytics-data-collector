@@ -13,12 +13,21 @@ LOGGER_USER=logger
 LOGGER_PASSWORD=logger
 
 CAS_HOST=host.docker.internal
-CAS_PORT=3306
+CAS_PORT=3308
 CAS_DATABASE=emmet
 CAS_USER=cas
 CAS_PASSWORD=cas
+
+COLLECTORY_HOST=host.docker.internal
+COLLECTORY_PORT=3306
+COLLECTORY_DATABASE=collectory
+COLLECTORY_USER=collectory
+COLLECTORY_PASSWORD=collectory
 
 MATOMO_HOST=https://matomo.biodiversitydata.se
 MATOMO_TOKEN=replace_with_your_token
 
 LOKI_HOST=http://host.docker.internal:3100
+
+BIOCACHE_HOST=https://records.biodiversitydata.se
+IMAGE_SERVICE_HOST=https://images.biodiversitydata.se
