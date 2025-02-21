@@ -94,7 +94,7 @@ def _fetch():
     return datasets, counts
 
 
-def _insert(datasets, counts, connection):
+def _insert(datasets, counts, save_snapshot, connection):
 
     cursor = connection.cursor()
 
@@ -133,20 +133,18 @@ def _insert(datasets, counts, connection):
     psycopg2.extras.execute_values(cursor, insert_query, values)
 
     # Dataset snapshot
-    insert_query = """
-    INSERT INTO dataset_snapshot (uid, snapshot_date, records, media_files)
-    VALUES %s
-    """
-    values = [
-        (
-            uid,
-            datetime.datetime.today(),
-            item['record_count'],
-            item['media_count'],
-        )
-        for (uid, item) in counts.items()
-    ]
-    psycopg2.extras.execute_values(cursor, insert_query, values)
+    if save_snapshot:
+        insert_query = "INSERT INTO dataset_snapshot (uid, snapshot_date, records, media_files) VALUES %s"
+        values = [
+            (
+                uid,
+                datetime.date.today() - datetime.timedelta(days=1),
+                item['record_count'],
+                item['media_count'],
+            )
+            for (uid, item) in counts.items()
+        ]
+        psycopg2.extras.execute_values(cursor, insert_query, values)
 
     connection.commit()
     cursor.close()
@@ -159,8 +157,11 @@ def transfer(analytics_conn):
         datasets, counts = _fetch()
         print(f" - done, {len(datasets)} rows", end="")
 
-        print(" > inserting", end="")
-        _insert(datasets, counts, analytics_conn)
+        # Save snapshot on the first day of the month
+        save_snapshot = datetime.date.today().day == 1
+
+        print(f" > inserting, snapshot: {save_snapshot}", end="")
+        _insert(datasets, counts, save_snapshot, analytics_conn)
         print(" - done")
     
     except Exception as e:
