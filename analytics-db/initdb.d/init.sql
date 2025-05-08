@@ -50,15 +50,6 @@ CREATE TABLE site (
     name VARCHAR(255)
 );
 
-/* Mirroreum */
-CREATE TABLE mirroreum_login (
-    id SERIAL PRIMARY KEY,
-    login_at TIMESTAMP NOT NULL,
-    ip VARCHAR(16) NOT NULL,
-    is_test BOOLEAN
-);
-CREATE UNIQUE INDEX mirroreum_login_ip_login_at_idx ON mirroreum_login (ip, login_at);
-
 /* Dataset */
 CREATE TABLE dataset (
     id INTEGER NOT NULL PRIMARY KEY,
