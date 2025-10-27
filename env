@@ -24,6 +24,12 @@ COLLECTORY_DATABASE=collectory
 COLLECTORY_USER=collectory
 COLLECTORY_PASSWORD=collectory
 
+SPATIAL_HOST=host.docker.internal
+SPATIAL_PORT=5433
+SPATIAL_DATABASE=layersdb
+SPATIAL_USER=layers
+SPATIAL_PASSWORD=layers
+
 MATOMO_HOST=https://matomo.biodiversitydata.se
 MATOMO_TOKEN=replace_with_your_token
 

@@ -6,6 +6,7 @@ import downloads
 import users
 import visits
 import datasets
+import spatial_portal
 
 analytics_config = {
     'host': os.getenv('ANALYTICS_HOST'),
@@ -24,6 +25,7 @@ if __name__ == "__main__":
     users.transfer(analytics_conn)
     visits.transfer(analytics_conn)
     datasets.transfer(analytics_conn)
+    spatial_portal.transfer(analytics_conn)
 
     print("=== Done ===")
 

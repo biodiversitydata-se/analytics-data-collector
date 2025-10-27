@@ -72,3 +72,13 @@ CREATE TABLE dataset_snapshot (
     media INTEGER
 );
 CREATE UNIQUE INDEX dataset_snapshot_uid_snapshot_date_idx ON dataset_snapshot (uid, snapshot_date);
+
+/* Spatial task */
+CREATE TABLE spatial_task (
+    id INTEGER NOT NULL PRIMARY KEY,
+    created TIMESTAMP NOT NULL,
+    name VARCHAR(40) NOT NULL,
+    message TEXT,
+    user_id INTEGER
+);
+CREATE INDEX spatial_task_created_idx ON spatial_task (created);
