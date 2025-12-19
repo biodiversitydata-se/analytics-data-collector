@@ -1,7 +1,7 @@
 services:
 
   analytics_db:
-    image: postgres:17.6
+    image: postgres:17.7
     container_name: analytics-db
     environment:
       POSTGRES_USER: analytics
