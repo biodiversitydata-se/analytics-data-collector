@@ -19,6 +19,10 @@ SELECT
   created,
   lrt.name AS reason,
   lst.name AS source,
+  (SELECT SUM(record_count) 
+	  FROM log_detail 
+	  WHERE log_event_id = le.id 
+	  AND entity_uid LIKE 'dr%') AS record_count,
   CASE
     WHEN lst.name = 'ALA'
     OR user_agent LIKE 'mozilla%' THEN 'Web'
@@ -48,6 +52,7 @@ FROM
   LEFT JOIN log_reason_type lrt ON le.log_reason_type_id = lrt.id
 WHERE
   log_event_type_id = 1002
+  AND EXISTS (SELECT 1 FROM log_detail WHERE log_event_id = le.id)
 """
 
     connection = mysql.connector.connect(**db_config)
@@ -67,7 +72,7 @@ def _insert(downloads, connection):
     cursor.execute("TRUNCATE TABLE download")
 
     insert_query = """
-    INSERT INTO download (id, created, reason, source, client, is_test, user_key, user_agent)
+    INSERT INTO download (id, created, reason, source, record_count, client, is_test, user_key, user_agent)
     VALUES %s
     """
     values = [
@@ -76,6 +81,7 @@ def _insert(downloads, connection):
             row['created'],
             row['reason'],
             row['source'],
+            row['record_count'], 
             row['client'],
             bool(row['is_test']),
             row['user_key'],

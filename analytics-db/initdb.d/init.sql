@@ -4,6 +4,7 @@ CREATE TABLE download (
     created TIMESTAMP NOT NULL,
     reason VARCHAR(255),
     source VARCHAR(255),
+    record_count INTEGER,
     client VARCHAR(255),
     is_test BOOLEAN,
     user_key VARCHAR(255),
