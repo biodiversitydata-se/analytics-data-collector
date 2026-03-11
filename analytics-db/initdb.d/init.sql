@@ -25,6 +25,14 @@ CREATE TABLE "user" (
 CREATE INDEX user_date_created_idx ON "user" (date_created);
 CREATE INDEX user_last_login_idx ON "user" (last_login);
 
+/* Login */
+CREATE TABLE "login" (
+    id SERIAL PRIMARY KEY,
+    user_key VARCHAR(255) NOT NULL,
+    login_time TIMESTAMP NOT NULL
+);
+CREATE INDEX login_login_time_idx ON "login" (login_time);
+
 /* Visit */
 CREATE TABLE visit (
     id SERIAL PRIMARY KEY,

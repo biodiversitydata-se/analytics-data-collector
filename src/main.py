@@ -4,6 +4,7 @@ import sys
 import psycopg2
 
 import downloads
+import logins
 import users
 import visits
 import datasets
@@ -30,6 +31,8 @@ if __name__ == "__main__":
         downloads.transfer(analytics_conn)
     if run_module('users'):
         users.transfer(analytics_conn)
+    if run_module('logins'):
+        logins.transfer(analytics_conn)
     if run_module('visits'):
         visits.transfer(analytics_conn)
     if run_module('datasets'):
