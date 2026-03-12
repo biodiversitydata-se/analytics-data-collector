@@ -22,9 +22,14 @@ def _fetch():
     logins = list(collection.find({"actionPerformed": "AUTHENTICATION_SUCCESS", 
                                    "principal": {"$nin": ["mats.bovin@nrm.se", 
                                                           "mats.bovin@gmail.com", 
-                                                          "manash.shah@nrm.se"]}}))
-    oauth2_events = list(collection.find({"actionPerformed": "OAUTH2_USER_PROFILE_CREATED"}))
-    service_ticket_events = list(collection.find({"actionPerformed": "SERVICE_TICKET_VALIDATE_SUCCESS"}))
+                                                          "manash.shah@nrm.se"]}})
+                            .sort("whenActionWasPerformed", 1))
+    oauth2_events = list(collection
+                         .find({"actionPerformed": "OAUTH2_USER_PROFILE_CREATED"})
+                         .sort("whenActionWasPerformed", 1))
+    service_ticket_events = list(collection
+                                 .find({"actionPerformed": "SERVICE_TICKET_VALIDATE_SUCCESS"})
+                                 .sort("whenActionWasPerformed", 1))
 
     client.close()
 
