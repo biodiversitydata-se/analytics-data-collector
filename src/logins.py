@@ -7,7 +7,15 @@ import psycopg2.extras
 import pymongo
 
 
-def _fetch():
+def _get_last_transfer(connection):
+    cursor = connection.cursor()
+    cursor.execute("SELECT MAX(login_time) FROM login")
+    result = cursor.fetchone()
+    cursor.close()
+    return result[0] if result and result[0] else datetime.datetime.min
+
+
+def _fetch(last_transfer):
     client = pymongo.MongoClient(
         host=os.getenv('CAS_AUDIT_HOST'),
         port=int(os.getenv('CAS_AUDIT_PORT')),
@@ -19,17 +27,21 @@ def _fetch():
     collection = db['MongoDbCasAuditRepository']
     
     # Fetch all relevant audit events from MongoDB
-    logins = list(collection.find({"actionPerformed": "AUTHENTICATION_SUCCESS", 
-                                   "principal": {"$nin": ["mats.bovin@nrm.se", 
-                                                          "mats.bovin@gmail.com", 
-                                                          "manash.shah@nrm.se"]}})
-                            .sort("whenActionWasPerformed", 1))
+    logins = list(collection
+                    .find({"actionPerformed": "AUTHENTICATION_SUCCESS", 
+                            "whenActionWasPerformed": {"$gt": last_transfer},
+                            "principal": {"$nin": ["mats.bovin@nrm.se", 
+                                                   "mats.bovin@gmail.com", 
+                                                   "manash.shah@nrm.se"]}})
+                    .sort("whenActionWasPerformed", 1))
     oauth2_events = list(collection
-                         .find({"actionPerformed": "OAUTH2_USER_PROFILE_CREATED"})
-                         .sort("whenActionWasPerformed", 1))
+                            .find({"actionPerformed": "OAUTH2_USER_PROFILE_CREATED",
+                                   "whenActionWasPerformed": {"$gt": last_transfer}})
+                            .sort("whenActionWasPerformed", 1))
     service_ticket_events = list(collection
-                                 .find({"actionPerformed": "SERVICE_TICKET_VALIDATE_SUCCESS"})
-                                 .sort("whenActionWasPerformed", 1))
+                                    .find({"actionPerformed": "SERVICE_TICKET_VALIDATE_SUCCESS",
+                                           "whenActionWasPerformed": {"$gt": last_transfer}})
+                                    .sort("whenActionWasPerformed", 1))
 
     client.close()
 
@@ -70,8 +82,6 @@ def _fetch():
 def _insert(logins, connection):
     cursor = connection.cursor()
 
-    cursor.execute("TRUNCATE TABLE login")
-
     insert_query = """
     INSERT INTO login (user_key, service, login_time)
     VALUES %s
@@ -93,8 +103,10 @@ def _insert(logins, connection):
 def transfer(analytics_conn):
 
     try:
-        print("Logins > fetching", end="")
-        logins = _fetch()
+        last_transfer = _get_last_transfer(analytics_conn)
+
+        print(f"Logins > fetching from {last_transfer.isoformat()}", end="")
+        logins = _fetch(last_transfer)
         print(f" - done, {len(logins)} rows", end="")
 
         print(f" > inserting", end="")
