@@ -29,6 +29,7 @@ CREATE INDEX user_last_login_idx ON "user" (last_login);
 CREATE TABLE "login" (
     id SERIAL PRIMARY KEY,
     user_key VARCHAR(255) NOT NULL,
+    service VARCHAR(255),
     login_time TIMESTAMP NOT NULL
 );
 CREATE INDEX login_login_time_idx ON "login" (login_time);
