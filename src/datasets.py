@@ -89,7 +89,7 @@ def _fetch():
         for (uid, record_count) in record_counts.items() 
     }
     
-    datasets = _fetch_datasets()
+    datasets = [] #_fetch_datasets()
 
     return datasets, counts
 
@@ -99,38 +99,38 @@ def _insert(datasets, counts, save_snapshot, connection):
     cursor = connection.cursor()
 
     # Datasets
-    cursor.execute("TRUNCATE TABLE dataset")
+    # cursor.execute("TRUNCATE TABLE dataset")
 
-    insert_query = """
-    INSERT INTO dataset (
-        id,
-        uid,
-        name,
-        resource_type,
-        data_provider,
-        institution,
-        date_created,
-        data_currency,
-        records,
-        media)
-    VALUES %s
-    """
-    values = [
-        (
-            row['id'],
-            row['uid'],
-            row['name'],
-            row['resource_type'],
-            row['data_provider'],
-            row['institution'],
-            row['date_created'],
-            row['data_currency'],
-            counts.get(row['uid'], {}).get('record_count', 0),
-            counts.get(row['uid'], {}).get('media_count', 0),
-        )
-        for row in datasets
-    ]
-    psycopg2.extras.execute_values(cursor, insert_query, values)
+    # insert_query = """
+    # INSERT INTO dataset (
+    #     id,
+    #     uid,
+    #     name,
+    #     resource_type,
+    #     data_provider,
+    #     institution,
+    #     date_created,
+    #     data_currency,
+    #     records,
+    #     media)
+    # VALUES %s
+    # """
+    # values = [
+    #     (
+    #         row['id'],
+    #         row['uid'],
+    #         row['name'],
+    #         row['resource_type'],
+    #         row['data_provider'],
+    #         row['institution'],
+    #         row['date_created'],
+    #         row['data_currency'],
+    #         counts.get(row['uid'], {}).get('record_count', 0),
+    #         counts.get(row['uid'], {}).get('media_count', 0),
+    #     )
+    #     for row in datasets
+    # ]
+    # psycopg2.extras.execute_values(cursor, insert_query, values)
 
     # Dataset snapshot
     if save_snapshot:

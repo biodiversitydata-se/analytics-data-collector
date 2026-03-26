@@ -27,18 +27,18 @@ if __name__ == "__main__":
 
     analytics_conn = psycopg2.connect(**analytics_config)
 
-    if run_module('downloads'):
-        downloads.transfer(analytics_conn)
-    if run_module('users'):
-        users.transfer(analytics_conn)
-    if run_module('logins'):
-        logins.transfer(analytics_conn)
+    #if run_module('downloads'):
+    #    downloads.transfer(analytics_conn)
+    #if run_module('users'):
+    #    users.transfer(analytics_conn)
+    #if run_module('logins'):
+    #    logins.transfer(analytics_conn)
     if run_module('visits'):
         visits.transfer(analytics_conn)
     if run_module('datasets'):
         datasets.transfer(analytics_conn)
-    if run_module('spatial_portal'):
-        spatial_portal.transfer(analytics_conn)
+    #if run_module('spatial_portal'):
+    #    spatial_portal.transfer(analytics_conn)
 
     print("=== Done ===")
 
